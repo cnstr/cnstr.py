@@ -1,0 +1,4 @@
+**__pycache__
+venv/
+src/canisterpy.egg-info
+dist/
