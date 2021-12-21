@@ -14,13 +14,19 @@ c = Canister('canister.py testing (0.9)')
 
 # log 100 packages
 print('------- PACKAGES -------')
-for package in c.search_package('ae', limit=100):
+packages = c.search_package('ae', limit=100)
+for package in packages:
     print(f'Got {package.identifier} by {package.maintainer} (hosted by {package.repository.get("name")}) on version {package.version}')
+print(f'Found {len(packages)} repos in total.')
 
-# log 4 repos
+
+# log a whole bunch of repos
 print ('------- REPOSITORIES ------')
-for package in c.search_repo('pack'):
+repos = c.search_repo('')
+for package in c.search_repo(''):
     print(f'Got {package.name} ({package.uri}) on version {package.version}')
+print(f'Found {len(repos)} repos in total.')
+
 
 # log the time difference
 print(f'------- FINISHED in {(datetime.now().timestamp() - start.timestamp()) * 1000} ms. -------')

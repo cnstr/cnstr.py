@@ -2,12 +2,13 @@
 # canister.py
 
 # imports
-from typing import List
+import asyncio
+import urllib
+from xmlrpc.client import Boolean
+from .errors import InitializationError
 from .requests import canister_request
 from .types import Repo, Package
-from .errors import InitializationError
-import urllib
-import asyncio
+from typing import List
 
 
 class Canister():
@@ -35,9 +36,7 @@ class Canister():
         # make request
         response = asyncio.run(canister_request(f'/packages/search?query={query}&limit={limit}&searchFields={search_fields}&responseFields=name,author,maintainer,description&responseFields=identifier,header,tintColor,name,price,description,packageIcon,repository.uri,repository.name,author,maintainer,latestVersion,nativeDepiction,depiction', self.ua))
         # convert packages to Package objects
-        end_result = [Package(package) for package in response.get('data')]
-        # return our end result
-        return end_result
+        return [Package(package) for package in response.get('data')]
     
     
     def search_repo(self, query: str) -> List[Repo]:
@@ -52,6 +51,4 @@ class Canister():
         # make request
         response = asyncio.run(canister_request(f'/repositories/search?query={query}', self.ua))
         # convert packages to Repository objects
-        end_result = [Repo(repo) for repo in response.get('data')]
-        # return our end result
-        return end_result
+        return [Repo(repo) for repo in response.get('data')]
