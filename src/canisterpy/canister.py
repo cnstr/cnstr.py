@@ -4,7 +4,6 @@
 # imports
 import asyncio
 import urllib
-from xmlrpc.client import Boolean
 from .errors import InitializationError
 from .requests import canister_request
 from .types import Repo, Package
