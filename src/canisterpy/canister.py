@@ -3,6 +3,7 @@
 
 # imports
 import asyncio
+from tkinter import E
 import urllib
 from .errors import InitializationError
 from .requests import canister_request
@@ -19,7 +20,15 @@ class Canister():
         if user_agent is None:
             raise InitializationError('You did not specify a User Agent to use.')
         self.ua = user_agent
-        self.loop = asyncio.new_event_loop()
+        # loop detection
+        try:
+            loop = asyncio.get_running_loop()
+        except:
+            loop = None
+        if loop and loop.is_running():
+            self.loop = loop
+        else:
+            self.loop = asyncio.new_event_loop()
 
 
     def search_package(self, query: str, search_fields: str = "name,author,maintainer,description", limit: int = 100) -> List[Package]:
