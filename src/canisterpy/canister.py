@@ -19,6 +19,7 @@ class Canister():
         if user_agent is None:
             raise InitializationError('You did not specify a User Agent to use.')
         self.ua = user_agent
+        self.loop = asyncio.new_event_loop()
 
 
     def search_package(self, query: str, search_fields: str = "name,author,maintainer,description", limit: int = 100) -> List[Package]:
@@ -33,7 +34,7 @@ class Canister():
         # normalize query string
         query = urllib.parse.quote(query)
         # make request
-        response = asyncio.run(canister_request(f'/packages/search?query={query}&limit={limit}&searchFields={search_fields}&responseFields=name,author,maintainer,description&responseFields=identifier,header,tintColor,name,price,description,packageIcon,repository.uri,repository.name,author,maintainer,latestVersion,nativeDepiction,depiction', self.ua))
+        response = self.loop.run_until_complete(canister_request(f'/packages/search?query={query}&limit={limit}&searchFields={search_fields}&responseFields=name,author,maintainer,description&responseFields=identifier,header,tintColor,name,price,description,packageIcon,repository.uri,repository.name,author,maintainer,latestVersion,nativeDepiction,depiction', self.ua))
         # convert packages to Package objects
         return [Package(package) for package in response.get('data')]
     
@@ -48,6 +49,6 @@ class Canister():
         # normalize query string
         query = urllib.parse.quote(query)
         # make request
-        response = asyncio.run(canister_request(f'/repositories/search?query={query}', self.ua))
+        response = self.loop.run_until_complete(canister_request(f'/repositories/search?query={query}', self.ua))
         # convert packages to Repository objects
         return [Repo(repo) for repo in response.get('data')]
