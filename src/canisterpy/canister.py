@@ -2,8 +2,6 @@
 # canister.py
 
 # imports
-import asyncio
-from tkinter import E
 import urllib
 from .errors import InitializationError
 from .requests import canister_request
@@ -20,44 +18,35 @@ class Canister():
         if user_agent is None:
             raise InitializationError('You did not specify a User Agent to use.')
         self.ua = user_agent
-        # loop detection
-        try:
-            loop = asyncio.get_running_loop()
-        except:
-            loop = None
-        if loop and loop.is_running():
-            self.loop = loop
-        else:
-            self.loop = asyncio.new_event_loop()
 
 
-    def search_package(self, query: str, search_fields: str = "name,author,maintainer,description", limit: int = 100) -> List[Package]:
+    async def search_package(self, query: str, search_fields: str = "name,author,maintainer,description", limit: int = 100) -> List[Package]:
         '''Search for a package.
         Args:
             query (str): Query to search for.
             search_fields (Optional[str]): Fields to search for. (defaults to 'name,author,maintainer,description')
             limit (Optional[str]): Response length limit. (defaults to 100)
         Returns:
-            List of packages that Canister found matching the query.
+            List[Package]: List of packages that Canister found matching the query.
         '''
         # normalize query string
         query = urllib.parse.quote(query)
         # make request
-        response = self.loop.run_until_complete(canister_request(f'/packages/search?query={query}&limit={limit}&searchFields={search_fields}&responseFields=name,author,maintainer,description&responseFields=identifier,header,tintColor,name,price,description,packageIcon,repository.uri,repository.name,author,maintainer,latestVersion,nativeDepiction,depiction', self.ua))
+        response = await canister_request(f'/packages/search?query={query}&limit={limit}&searchFields={search_fields}&responseFields=name,author,maintainer,description&responseFields=identifier,header,tintColor,name,price,description,packageIcon,repository.uri,repository.name,author,maintainer,latestVersion,nativeDepiction,depiction', self.ua, 1)
         # convert packages to Package objects
         return [Package(package) for package in response.get('data')]
     
     
-    def search_repo(self, query: str) -> List[Repo]:
+    async def search_repo(self, query: str) -> List[Repo]:
         '''Search for a repo.
         Args:
             query (str): Query to search for.
         Returns:
-            List of repos that Canister found matching the query.
+            List[Repo]: List of repos that Canister found matching the query.
         '''
         # normalize query string
         query = urllib.parse.quote(query)
         # make request
-        response = self.loop.run_until_complete(canister_request(f'/repositories/search?query={query}', self.ua))
+        response = await canister_request(f'/repositories/search?query={query}', self.ua, 1)
         # convert packages to Repository objects
         return [Repo(repo) for repo in response.get('data')]
