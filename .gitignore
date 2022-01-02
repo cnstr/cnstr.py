@@ -2,3 +2,4 @@
 venv/
 src/canisterpy.egg-info
 dist/
+build/
