@@ -36,7 +36,7 @@ class Package(object):
         # native depiction of package
         self.native_depiction: Optional[str] = data.get('nativeDepiction')
         # icon of package
-        self.icon_url: Optional[str] = data.get('icon')
+        self.icon_url: Optional[str] = data.get('packageIcon')
         # repository
         self.repository: dict = {'uri': data.get('repository').get('uri'), 'name': data.get('repository').get('name')}
 

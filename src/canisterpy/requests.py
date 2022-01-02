@@ -7,7 +7,7 @@ import json
 from .errors import RequestError
 
 
-async def canister_request(path: str, ua: str) -> dict:
+async def canister_request(path: str, ua: str, version: int) -> dict:
     '''Make a request to the Canister API.
     Args:
         path (str): The Canister route to make a request to.
@@ -20,7 +20,7 @@ async def canister_request(path: str, ua: str) -> dict:
         # set up client
         async with aiohttp.ClientSession() as client:
             # make request
-            async with client.get(f'https://api.canister.me/v1/community{path}', headers={'User-Agent': ua}) as c:
+            async with client.get(f'https://api.canister.me/v{version}/community{path}', headers={'User-Agent': ua}) as c:
                 # if the status is 200,
                 if c.status == 200:
                     # send off our result
