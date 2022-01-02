@@ -15,6 +15,7 @@ jobs:
         uses: actions/setup-python@v2
       - name: Generate docs
         run: |
+          rm -r docs.md
           pip install -r requirements.txt
           python docs.py > docs.md
       - name: Push docs
