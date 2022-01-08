@@ -2,6 +2,7 @@
 # types.py
 
 # imports
+from datetime import datetime
 from typing import Optional
 
 # package object
@@ -10,6 +11,8 @@ class Package(object):
     Canister package object.
     '''
     def __init__(self, data: dict[str, str]):
+        # start time
+        start = datetime.now().timestamp()
         # identifier of package
         self.identifier: str = data.get('identifier')
         # depiction header
@@ -38,6 +41,8 @@ class Package(object):
         self.icon_url: Optional[str] = data.get('packageIcon')
         # repository
         self.repository: dict = {'uri': data.get('repository').get('uri'), 'name': data.get('repository').get('name')}
+        # end time
+        self.__time__ = datetime.now().timestamp() - start
 
 # repo object
 class Repo(object):
@@ -45,6 +50,8 @@ class Repo(object):
     Canister repo object.
     '''
     def __init__(self, data: dict[str, str]):
+        # start time
+        start = datetime.now().timestamp()
         # repo slug
         self.slug: str = data.get('slug')
         # repo aliases
@@ -59,3 +66,5 @@ class Repo(object):
         self.suite: Optional[str] = data.get('suite')
         # repo name
         self.name: str = data.get('name')
+        # end time
+        self.__time__ = datetime.now().timestamp() - start
