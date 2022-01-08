@@ -14,21 +14,28 @@ from canisterpy import Canister
 # initialize a Canister object
 c = Canister('canister.py testing (1.0)')
 
-# log 100 packages
-print('------- PACKAGES -------')
+# fetch 100 packages
+s = datetime.now().timestamp()
 packages = asyncio.run(c.search_package('ae', limit=100))
+fetchtime_packages = (datetime.now().timestamp() - s) * 1000
+time_packages = 0
 for package in packages:
-    print(f'Got {package.identifier} by {package.maintainer} (hosted by {package.repository.get("name")}) on version {package.version}')
-print(f'Found {len(packages)} repos in total.')
+    time_packages += package.__time__ * 1000
 
 
-# log a whole bunch of repos
-print ('------- REPOSITORIES ------')
+# fetch a whole bunch of repos
+s = datetime.now().timestamp()
 repos = asyncio.run(c.search_repo(''))
+fetchtime_repos = (datetime.now().timestamp() - s) * 1000
+time_repos = 0
 for repo in repos:
-    print(f'Got {repo.name} ({repo.uri}) on version {repo.version}')
-print(f'Found {len(repos)} repos in total.')
+    time_repos += repo.__time__ * 1000
 
+# times
+finish_ms = (fetchtime_repos + fetchtime_packages)
+packages_avg = (time_packages / len(packages))
+repos_avg = (time_repos / len(repos))
+net_time = (finish_ms - (time_packages + time_repos))
 
-# log the time difference
-print(f'------- FINISHED in {(datetime.now().timestamp() - start.timestamp()) * 1000} ms. -------')
+# log info
+print(f'------- STATS -------\nFound {len(repos)} repositories and {len(packages)} packages in {finish_ms} ms.\n\n------- PACKAGES -------\nTotal packages fetch time: {fetchtime_packages} ms\nTotal class assign time: {time_packages} ms\nClass assign time per package (avg): {packages_avg} ms\n\n------- REPOSITORIES -------\nTotal repositories fetch time: {fetchtime_repos} ms\nTotal class assign time: {time_repos} ms\nClass assign time per package (avg): {repos_avg} ms\n\n------- REQUESTS ------\nTotal networking time: {net_time} ms\nNetworking percentage: {round((net_time / finish_ms) * 100, 2)}%')
