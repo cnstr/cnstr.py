@@ -8,7 +8,6 @@ from .requests import canister_request
 from .types import Repo, Package
 from typing import List
 
-
 class Canister():
     '''The main Canister class.
     Args:
@@ -18,7 +17,6 @@ class Canister():
         if user_agent is None:
             raise InitializationError('You did not specify a User Agent to use.')
         self.ua = user_agent
-
 
     async def search_package(self, query: str, search_fields: str = "name,author,maintainer,description", limit: int = 100) -> List[Package]:
         '''Search for a package.
@@ -35,7 +33,6 @@ class Canister():
         response = await canister_request(f'/packages/search?query={query}&limit={limit}&searchFields={search_fields}&responseFields=name,author,maintainer,description&responseFields=identifier,header,tintColor,name,price,description,packageIcon,repository.uri,repository.name,author,maintainer,latestVersion,nativeDepiction,depiction', self.ua, 1)
         # convert packages to Package objects
         return [Package(package) for package in response.get('data')]
-    
     
     async def search_repo(self, query: str) -> List[Repo]:
         '''Search for a repo.

@@ -4,7 +4,6 @@
 # imports
 from typing import Optional
 
-
 # package object
 class Package(object):
     '''
@@ -39,7 +38,6 @@ class Package(object):
         self.icon_url: Optional[str] = data.get('packageIcon')
         # repository
         self.repository: dict = {'uri': data.get('repository').get('uri'), 'name': data.get('repository').get('name')}
-
 
 # repo object
 class Repo(object):

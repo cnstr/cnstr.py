@@ -6,7 +6,6 @@ import aiohttp
 import json
 from .errors import RequestError
 
-
 async def canister_request(path: str, ua: str, version: int) -> dict:
     '''Make a request to the Canister API.
     Args:
