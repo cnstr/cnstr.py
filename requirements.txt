@@ -1,1 +1,4 @@
+aiocache
 aiohttp
+ujson
+msgpack

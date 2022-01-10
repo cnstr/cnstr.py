@@ -4,7 +4,7 @@
 # imports
 import urllib
 from .errors import InitializationError
-from .requests import canister_request
+from .requests import canister_request, piracy_repos
 from .types import Repo, Package
 from typing import List
 
@@ -47,3 +47,17 @@ class Canister():
         response = await canister_request(f'/repositories/search?query={query}', self.ua, 1)
         # convert packages to Repository objects
         return [Repo(repo) for repo in response.get('data')]
+
+    async def is_repo_piracy(self, query: str) -> bool:
+        '''Find out if a repo is piracy.
+        Args:
+            query (str): Repo URI.
+        Returns:
+            bool: Whether or not the repo is piracy.
+        '''
+        # trim url string
+        query = query.replace('https://', '').replace('http://', '')
+        # get piracy repos
+        r = await piracy_repos()
+        # return
+        return query in r
