@@ -2,6 +2,12 @@
     Args:
         user_agent (str): User Agent to pass to the Canister API.
     
+# is_repo_piracy (`asynchronous` function of Canister):  Find out if a repo is piracy.
+    Args:
+        query (str): Repo URI.
+    Returns:
+        bool: Whether or not the repo is piracy.
+    
 # search_package (`asynchronous` function of Canister):  Search for a package.
     Args:
         query (str): Query to search for.
