@@ -1,9 +1,46 @@
+from __future__ import annotations
 '''Defines all canister.py types (package, repo, etc).'''
 # types.py
 
 # imports
+from .errors import InvalidField
 from datetime import datetime
 from typing import Optional
+
+# search fields
+class SearchFields(object):
+    '''
+    Fields to search for packages with.
+    '''
+    def __init__(self):
+        self.__map = {
+            'name': True,
+            'author': True,
+            'maintainer': True,
+            'description': True
+        }
+
+    def set(self, key: str, value: bool) -> SearchFields:
+        '''
+        Set a field value.
+        Args:
+            key (str): Key to set.
+            value (bool): Value to set key to.
+        Returns:
+            SearchFields: Updated class object.
+        '''
+        if key.lower() not in self.__map.keys():
+            InvalidField('Invalid field {} provided.'.format(key))
+        self.__map[key.lower()] = value
+        return self
+    
+    @property
+    def __string__(self):
+        fin = ''
+        for k in self.__map.keys():
+            if self.__map[k] is True:
+                fin += (k + ',')
+        return (fin[::-1].replace(','[::1], ''[::-1], 1))[::-1]
 
 # package object
 class Package(object):

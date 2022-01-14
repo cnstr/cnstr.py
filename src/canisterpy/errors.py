@@ -8,3 +8,7 @@ class RequestError(Exception):
 class InitializationError(Exception):
     '''Error thrown when something goes wrong with the initialization of the Canister class.'''
     pass
+
+class InvalidField(Exception):
+    '''Error thrown when an invalid field is passed to SearchFields.'''
+    pass

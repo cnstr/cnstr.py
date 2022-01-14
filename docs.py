@@ -4,9 +4,7 @@
 import src.canisterpy.canister as canisterpy
 import inspect
 
-
 def normalize(tn: str): return tn.replace('        ', '    ')
-
 
 def doc(td: object):
     if inspect.isclass(td):
@@ -22,3 +20,4 @@ def doc(td: object):
 doc(canisterpy.Canister)
 doc(canisterpy.Package)
 doc(canisterpy.Repo)
+doc(canisterpy.SearchFields)
