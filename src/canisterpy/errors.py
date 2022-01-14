@@ -12,3 +12,7 @@ class InitializationError(Exception):
 class InvalidField(Exception):
     '''Error thrown when an invalid field is passed to SearchFields.'''
     pass
+
+class ClosedError(Exception):
+    '''Error thrown when a client is trying to be used after it is closed..'''
+    pass

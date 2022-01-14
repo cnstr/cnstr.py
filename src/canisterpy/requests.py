@@ -2,13 +2,13 @@
 # requests.py
 
 # imports
-from aiocache import cached
-
-import aiohttp
-import json
 from .errors import RequestError
+from aiocache import cached
+from aiohttp import ClientSession
 
-async def canister_request(path: str, ua: str, version: int) -> dict:
+import json
+
+async def canister_request(path: str, ua: str, version: int, s: ClientSession) -> dict:
     '''Make a request to the Canister API.
     Args:
         path (str): The Canister route to make a request to.
@@ -18,38 +18,34 @@ async def canister_request(path: str, ua: str, version: int) -> dict:
     '''
     # initialize try so if anything goes wrong we know about it
     try:
-        # set up client
-        async with aiohttp.ClientSession() as client:
-            # make request
-            async with client.get(f'https://api.canister.me/v{version}/community{path}', headers={'User-Agent': ua}) as c:
-                # if the status is 200,
-                if c.status == 200:
-                    # send off our result
-                    return json.loads(await c.text())
-                # otherwise, crash it
-                else:
-                    raise RequestError(f'Request to path {path} failed (code {c.status}, v{version}).')
+        # make request
+        async with s.request(method='GET', url=f'https://api.canister.me/v{version}/community{path}', headers={'User-Agent': ua}) as c:
+            # if the status is 200,
+            if c.status == 200:
+                # send off our result
+                return json.loads(await c.text())
+            # otherwise, crash it
+            else:
+                raise RequestError(f'Request to path {path} failed (code {c.status}, v{version}).')
     except:
         raise RequestError(f'Request to path {path} failed.')
 
 @cached(ttl=3600)
-async def piracy_repos() -> dict:
+async def piracy_repos(s: ClientSession) -> dict:
     '''Get all piracy repositories.
     Returns:
         The request's return value.
     '''
     # initialize try so if anything goes wrong we know about it
     try:
-        # set up client
-        async with aiohttp.ClientSession() as client:
-            # make request
-            async with client.get(f'https://pull.canister.me/piracy-repositories.json') as c:
-                # if the status is 200,
-                if c.status == 200:
-                    # send off our result
-                    return json.loads(await c.text())
-                # otherwise, crash it
-                else:
-                    raise RequestError(f'Request to https://pull.canister.me/piracy-repositories.json failed (code {c.status}).')
+        # make request
+        async with s.request(method='GET', url=f'https://pull.canister.me/piracy-repositories.json') as c:
+            # if the status is 200,
+            if c.status == 200:
+                # send off our result
+                return json.loads(await c.text())
+            # otherwise, crash it
+            else:
+                raise RequestError(f'Request to https://pull.canister.me/piracy-repositories.json failed (code {c.status}).')
     except:
         raise RequestError(f'Request to https://pull.canister.me/piracy-repositories.json failed.')

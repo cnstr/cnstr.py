@@ -34,7 +34,8 @@ fetchtime_repos = (datetime.now().timestamp() - s) * 1000
 time_repos = 0
 for repo in repos: time_repos += repo.__time__ * 1000
 
-# close loop
+# close client and loop
+if not c.closed: c.close()
 if not loop.is_closed(): loop.close()
 
 # times
