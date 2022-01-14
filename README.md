@@ -10,7 +10,7 @@ The official library for interacting with [Canister](https://canister.me) in Pyt
 Made with love by [Jaidan](https://github.com/ja1dan).
 
 ## 💻 Documentation
-See [here](./docs.md) for all Canister.py documentation.
+See [here](./DOCUMENTATION.md) for all Canister.py documentation.
 
 ## ❓ Contributing
 See [here](./CONTRIBUTING.md) for instructions on how to contribute.
