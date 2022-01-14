@@ -1,7 +1,9 @@
 # Canister (class):  The main Canister class.
     Args:
         user_agent (str): User Agent to pass to the Canister API.
+        session (Optional[ClientSession]): Optional session to use for requests.
     
+# close (`synchronous` function of Canister):  Close and deallocate the current client.
 # is_repo_piracy (`asynchronous` function of Canister):  Find out if a repo is piracy.
     Args:
         query (str): Repo URI.
@@ -22,14 +24,6 @@
     Returns:
         List[Repo]: List of repos that Canister found matching the query.
     
-# RequestError (class):  Error thrown when something goes wrong with a Canister API request.
-# args (`synchronous` getset_descriptor of RequestError):  None
-# with_traceback (`synchronous` method_descriptor of RequestError):  Exception.with_traceback(tb) --
-    set self.__traceback__ to tb and return self.
-# InitializationError (class):  Error thrown when something goes wrong with the initialization of the Canister class.
-# args (`synchronous` getset_descriptor of InitializationError):  None
-# with_traceback (`synchronous` method_descriptor of InitializationError):  Exception.with_traceback(tb) --
-    set self.__traceback__ to tb and return self.
 # InvalidField (class):  Error thrown when an invalid field is passed to SearchFields.
 # args (`synchronous` getset_descriptor of InvalidField):  None
 # with_traceback (`synchronous` method_descriptor of InvalidField):  Exception.with_traceback(tb) --
