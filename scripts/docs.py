@@ -17,7 +17,7 @@ def doc(td: object):
     else: print(f'# {td.__name__} ({type(td).__name__}):  {str(td.__doc__)}')
 
 for c in cpy.__dict__:
-    if not c.startswith('__') and c[0].isupper():
+    if not c.startswith('__') and c[0].isupper() and not 'error' in c.lower():
         g = getattr(cpy, c)
         doc(g)
 
