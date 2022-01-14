@@ -2,6 +2,7 @@
 
 # Canister.py
 
+[![License](https://img.shields.io/github/license/cnstr/canister.py)](https://github.com/cnstr/canister.py/blob/main/LICENSE)
 [![Stars](https://img.shields.io/github/stars/cnstr/canister.py)](https://github.com/cnstr/canister.py/stargazers)
 [![LoC](https://img.shields.io/tokei/lines/github/cnstr/canister.py)](https://github.com/cnstr/canister.py)
 
