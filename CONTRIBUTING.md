@@ -1,0 +1,3 @@
+# Contributing
+
+Contributing to this repository is simple. [Set up a virtual env](https://docs.python.org/3/library/venv.html), install the dependencies in `requirements.txt`, edit any files that you deem necessary to integrate your feature / fix, test your changes using `scripts/time-test.py`, then create a pull request. Be sure to continue using the code style of the rest of the project (comments, docstrings, etc.) and DO NOT generate documentation before pushing. There is an action in place to do so on push.
