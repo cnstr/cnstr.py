@@ -22,6 +22,18 @@
     Returns:
         List[Repo]: List of repos that Canister found matching the query.
     
+# RequestError (class):  Error thrown when something goes wrong with a Canister API request.
+# args (`synchronous` getset_descriptor of RequestError):  None
+# with_traceback (`synchronous` method_descriptor of RequestError):  Exception.with_traceback(tb) --
+    set self.__traceback__ to tb and return self.
+# InitializationError (class):  Error thrown when something goes wrong with the initialization of the Canister class.
+# args (`synchronous` getset_descriptor of InitializationError):  None
+# with_traceback (`synchronous` method_descriptor of InitializationError):  Exception.with_traceback(tb) --
+    set self.__traceback__ to tb and return self.
+# InvalidField (class):  Error thrown when an invalid field is passed to SearchFields.
+# args (`synchronous` getset_descriptor of InvalidField):  None
+# with_traceback (`synchronous` method_descriptor of InvalidField):  Exception.with_traceback(tb) --
+    set self.__traceback__ to tb and return self.
 # Package (class):  
     Canister package object.
     
