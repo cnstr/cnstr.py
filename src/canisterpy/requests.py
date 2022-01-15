@@ -4,8 +4,11 @@
 # imports
 from .errors import RequestError
 from aiocache import cached
-from aiohttp import ClientSession
 from json import loads
+
+import logging
+
+_log = logging.getLogger(__name__)
 
 async def canister_request(path: str, klass) -> dict:
     '''Make a request to the Canister API.
@@ -17,6 +20,7 @@ async def canister_request(path: str, klass) -> dict:
     '''
     # initialize try so if anything goes wrong we know about it
     try:
+        _log.debug('Making request to path %s using Canister version %s.', path, klass._version)
         # make request
         async with klass._session.request(method='GET', url=f'https://api.canister.me/v{klass._version}/community{path}', headers={'User-Agent': klass._ua}) as c:
             # if the status is 200,
@@ -37,6 +41,7 @@ async def piracy_repos(klass) -> dict:
     '''
     # initialize try so if anything goes wrong we know about it
     try:
+        _log.debug('Making routine request to https://pull.canister.me/piracy-repositories.json.')
         # make request
         async with klass._session.request(method='GET', url=f'https://pull.canister.me/piracy-repositories.json') as c:
             # if the status is 200,
