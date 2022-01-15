@@ -7,87 +7,65 @@ from .errors import InvalidFieldError
 from datetime import datetime
 from typing import Optional
 
+# fields
+class Fields(object):
+    def __init__(self, map):
+        self.__map = map
+    
+    def all_true(self) -> PackageSearchFields:
+        '''Sets all fields to true.'''
+        for m in self.__map.keys():
+            self.__map[m] = True
+        return self
+
+    def set(self, key: str, value: bool) -> PackageSearchFields:
+        '''Set a field value.
+        Args:
+            key (str): Key to set.
+            value (bool): Value to set key to.
+        Returns:
+            SearchFields: Updated class object.
+        '''
+        if key.lower() not in self.__map.keys():
+            InvalidFieldError('Invalid field {} provided.'.format(key))
+        self.__map[key.lower()] = value
+        return self
+    
+    @property
+    def __string__(self):
+        final = ''
+        for key in self.__map.keys():
+            if self.__map[key] is True:
+                final += (key + ',')
+        return (final[::-1].replace(','[::1], ''[::-1], 1))[::-1]
+
 # package search fields
-class PackageSearchFields(object):
+class PackageSearchFields(Fields):
     '''
     Fields to search for packages with.
     '''
     def __init__(self):
-        self.__map = {
+        super().__init__(map={
             'name': False,
             'author': False,
             'maintainer': False,
             'description': False,
             'identifier': False
-        }
-    
-    def all_true(self) -> PackageSearchFields:
-        '''Sets all fields to true.'''
-        for m in self.__map.keys():
-            self.__map[m] = True
-        return self
-
-    def set(self, key: str, value: bool) -> PackageSearchFields:
-        '''Set a field value.
-        Args:
-            key (str): Key to set.
-            value (bool): Value to set key to.
-        Returns:
-            SearchFields: Updated class object.
-        '''
-        if key.lower() not in self.__map.keys():
-            InvalidFieldError('Invalid field {} provided.'.format(key))
-        self.__map[key.lower()] = value
-        return self
-    
-    @property
-    def __string__(self):
-        fin = ''
-        for k in self.__map.keys():
-            if self.__map[k] is True:
-                fin += (k + ',')
-        return (fin[::-1].replace(','[::1], ''[::-1], 1))[::-1]
+        })
 
 # repository search fields
-class RepositorySearchFields(object):
+class RepositorySearchFields(Fields):
     '''
     Fields to search for repositories with.
     '''
     def __init__(self):
-        self.__map = {
+        super().__init__(map={
             'slug': False,
             'uri': False,
             'aliases': False,
             'name': False,
             'description': False
-        }
-    
-    def all_true(self) -> PackageSearchFields:
-        '''Sets all fields to true.'''
-        for m in self.__map.keys():
-            self.__map[m] = True
-        return self
-
-    def set(self, key: str, value: bool) -> PackageSearchFields:
-        '''Set a field value.
-        Args:
-            key (str): Key to set.
-            value (bool): Value to set key to.
-        Returns:
-            SearchFields: Updated class object.
-        '''
-        if key.lower() not in self.__map.keys():
-            InvalidFieldError('Invalid field {} provided.'.format(key))
-        self.__map[key.lower()] = value
-        return self
-    
-    @property
-    def __string__(self):
-        fin = ''
-        for k in self.__map.keys():
-            if self.__map[k] is True:
-                fin += (k + ',')
-        return (fin[::-1].replace(','[::1], ''[::-1], 1))[::-1]
+        })
 
 # package object
 class Package(object):
@@ -124,7 +102,10 @@ class Package(object):
         # icon of package
         self.icon_url: Optional[str] = data.get('packageIcon')
         # repository
-        self.repository: dict = {'uri': data.get('repository').get('uri'), 'name': data.get('repository').get('name')}
+        self.repository: dict = {
+            'uri': data.get('repository').get('uri'),
+            'name': data.get('repository').get('name')
+        }
         # end time
         self.__time__ = datetime.now().timestamp() - start
 

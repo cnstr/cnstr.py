@@ -3,15 +3,13 @@
 
 # imports
 from .errors import (
-    InitializationError, ClosedError
-)
-from .requests import (
-    canister_request, piracy_repos
+    ClosedError, InitializationError, RequestError
 )
 from .types import (
     Repo, Package, PackageSearchFields, RepositorySearchFields
 )
 from aiohttp import ClientSession
+from aiocache import cached
 from asyncio import run
 from atexit import register
 from datetime import datetime
@@ -32,9 +30,9 @@ class Canister():
         if user_agent is None:
             raise InitializationError('You did not specify a User Agent to use.')
         self.__init_time__ = datetime.now()
-        self._session = session
-        self._version = 1
-        self._ua = user_agent
+        self.__session = session
+        self.__version = 1
+        self.__ua = user_agent
         self.__closed = False
         # register closing to happen when deallocated
         register(self.close)
@@ -42,12 +40,55 @@ class Canister():
     async def __pre_method__(self):
         if self.__closed:
             raise ClosedError('This client is closed.')
-        if self._session is None:
+        if self.__session is None:
             _log.info('Creating new AIOHTTP client.')
-            self._session = ClientSession()
+            self.__session = ClientSession()
+
+    async def __canister_request(self, path: str) -> dict[str, str]:
+        '''Make a request to the Canister API.
+        Args:
+            path (str): The Canister route to make a request to.
+        Returns:
+            dict[str, str]: The request's return value.
+        '''
+        # initialize try so if anything goes wrong we know about it
+        try:
+            _log.debug('Making request to path %s using Canister version %s.', path, self.__version)
+            # make request
+            async with self.__session.request(method='GET', url=f'https://api.canister.me/v{self.__version}/community{path}', headers={'User-Agent': self.__ua}) as c:
+                # if the status is 200,
+                if c.status == 200:
+                    # send off our result
+                    return (await c.json())
+                # otherwise, crash it
+                else:
+                    raise RequestError(f'Request to path {path} failed (code {c.status}, Canister v{self.__version}).')
+        except:
+            raise RequestError(f'Request to path {path} failed.')
+
+    @cached(ttl=3600)
+    async def __piracy_repos(self) -> list[str]:
+        '''Get all piracy repositories.
+        Returns:
+            list[str]: List of piracy repos.
+        '''
+        # initialize try so if anything goes wrong we know about it
+        try:
+            _log.debug('Making routine request to https://pull.canister.me/piracy-repositories.json.')
+            # make request
+            async with self.__session.request(method='GET', url=f'https://pull.canister.me/piracy-repositories.json') as c:
+                # if the status is 200,
+                if c.status == 200:
+                    # send off our result
+                    return (await c.json())
+                # otherwise, crash it
+                else:
+                    raise RequestError(f'Request to https://pull.canister.me/piracy-repositories.json failed (code {c.status}).')
+        except:
+            raise RequestError(f'Request to https://pull.canister.me/piracy-repositories.json failed.')
     
     def is_closed(self) -> bool:
-        '''Checks if the client is closed.'''
+        '''Check if the client is closed.'''
         return self.__closed
     
     def close(self):
@@ -60,10 +101,10 @@ class Canister():
         No other methods should be called after this one.'''
         # error checks
         if self is None: return
-        if self._session is None: return
+        if self.__session is None: return
         # close the http session
-        if not self._session.closed:
-            run(self._session.close())
+        if not self.__session.closed:
+            run(self.__session.close())
         self.__closed = True
 
     async def search_package(self, query: str, search_fields: PackageSearchFields = PackageSearchFields().all_true(), limit: int = 100) -> List[Package]:
@@ -80,7 +121,7 @@ class Canister():
         # normalize query string
         query = quote(query)
         # make request
-        response = await canister_request(f'/packages/search?query={query}&limit={limit}&searchFields={search_fields.__string__}&responseFields=*', self)
+        response = await self.__canister_request(f'/packages/search?query={query}&limit={limit}&searchFields={search_fields.__string__}&responseFields=*')
         # convert packages to Package objects
         return [Package(package) for package in response.get('data')]
     
@@ -97,22 +138,22 @@ class Canister():
         # normalize query string
         query = quote(query)
         # make request
-        response = await canister_request(f'/repositories/search?query={query}&searchFields={search_fields.__string__}', self)
+        response = await self.__canister_request(f'/repositories/search?query={query}&searchFields={search_fields.__string__}')
         # convert packages to Repository objects
         return [Repo(repo) for repo in response.get('data')]
 
-    async def is_repo_piracy(self, query: str) -> bool:
-        '''Find out if a repo is piracy.
+    async def is_repo_safe(self, query: str) -> bool:
+        '''Find out if a repo is safe.
         Args:
             query (str): Repo URI.
         Returns:
-            bool: Whether or not the repo is piracy.
+            bool: Whether or not the repo is safe.
         '''
         # run pre-method function
         await self.__pre_method__()
         # trim url string
         query = query.replace('https://', '').replace('http://', '')
         # get piracy repos
-        r = await piracy_repos(self)
+        r = await self.__piracy_repos()
         # return
         return query in r
