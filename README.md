@@ -16,3 +16,32 @@ See [here](./DOCUMENTATION.md) for all Canister.py documentation.
 See [here](./CONTRIBUTING.md) for instructions on how to contribute.
 
 ## ⚡️ Example Usage
+Below is a good example of how to use Canister.py.
+```py
+# import asyncio
+import asyncio
+# import types
+from typing import List
+# import canister
+from canisterpy import (
+    Canister, Package, SearchFields
+)
+
+# set up client
+client = Canister(ua='Canister.py Example')
+
+# main function
+async def main(package: str) -> List[Package]:
+    # create search fields
+    fields = SearchFields()
+    # pick out fields
+    # we want to search by name and author, so
+    fields.set('name', True).set('author', True).set('maintainer', False).set('description', False)
+    # search for query
+    packages = client.search_package(package, fields)
+    # return what we found
+    return packages
+
+print(asyncio.run(main('test')))
+if not client.is_closed(): client.close()
+```
