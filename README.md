@@ -28,7 +28,7 @@ from canisterpy import (
 )
 
 # set up client
-client = Canister(ua='Canister.py Example')
+client = Canister(user_agent='Canister.py Example')
 
 # main function
 async def main(package: str) -> List[Package]:
