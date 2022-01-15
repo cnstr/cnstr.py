@@ -3,5 +3,5 @@
 
 # imports
 from .canister import Canister
-from .errors import RequestError, InitializationError, InvalidField
+from .errors import RequestError, InitializationError, InvalidFieldError
 from .types import Package, Repo, SearchFields

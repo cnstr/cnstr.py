@@ -3,7 +3,7 @@ from __future__ import annotations
 # types.py
 
 # imports
-from .errors import InvalidField
+from .errors import InvalidFieldError
 from datetime import datetime
 from typing import Optional
 
@@ -30,7 +30,7 @@ class SearchFields(object):
             SearchFields: Updated class object.
         '''
         if key.lower() not in self.__map.keys():
-            InvalidField('Invalid field {} provided.'.format(key))
+            InvalidFieldError('Invalid field {} provided.'.format(key))
         self.__map[key.lower()] = value
         return self
     

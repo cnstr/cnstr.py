@@ -10,8 +10,7 @@ from asyncio import run
 from atexit import register
 from datetime import datetime
 from typing import List, Optional
-
-import urllib
+from urllib.parse import quote
 
 class Canister():
     '''The main Canister class.
@@ -23,21 +22,38 @@ class Canister():
         if user_agent is None:
             raise InitializationError('You did not specify a User Agent to use.')
         self.__init_time__ = datetime.now()
-        self.__session = session
-        self.closed = False
-        self.ua = user_agent
+        self._session = session
+        self._version = 1
+        self._ua = user_agent
+        self.__closed = False
         # register closing to happen when deallocated
         register(self.close)
+
+    async def __pre_method__(self):
+        if self.__closed:
+            raise ClosedError('This client is closed.')
+        if self._session is None:
+            self._session = ClientSession()
+    
+    def is_closed(self) -> bool:
+        '''Checks if the client is closed.'''
+        return self.__closed
     
     def close(self):
-        '''Close and deallocate the current client.'''
-        # if the client is closed, tell the user
-        if self.closed:
-            raise ClosedError('This client is closed.')
-        # else close the http session
-        if not self.__session.closed:
-            run(self.__session.close())
-        self.closed = True
+        '''Close the client.
+
+        No client methods should be running.
+
+        This is idempotent and irreversible.
+
+        No other methods should be called after this one.'''
+        # error checks
+        if self is None: return
+        if self._session is None: return
+        # close the http session
+        if not self._session.closed:
+            run(self._session.close())
+        self.__closed = True
 
     async def search_package(self, query: str, search_fields: SearchFields = SearchFields(), limit: int = 100) -> List[Package]:
         '''Search for a package.
@@ -48,14 +64,12 @@ class Canister():
         Returns:
             List[Package]: List of packages that Canister found matching the query.
         '''
-        if self.closed:
-            raise ClosedError('This client is closed.')
-        if self.__session is None:
-            self.__session = ClientSession()
+        # run pre-method function
+        await self.__pre_method__()
         # normalize query string
-        query = urllib.parse.quote(query)
+        query = quote(query)
         # make request
-        response = await canister_request(f'/packages/search?query={query}&limit={limit}&searchFields={search_fields.__string__}&responseFields=name,author,maintainer,description&responseFields=identifier,header,tintColor,name,price,description,packageIcon,repository.uri,repository.name,author,maintainer,latestVersion,nativeDepiction,depiction', self.ua, 1, self.__session)
+        response = await canister_request(f'/packages/search?query={query}&limit={limit}&searchFields={search_fields.__string__}&responseFields=name,author,maintainer,description&responseFields=identifier,header,tintColor,name,price,description,packageIcon,repository.uri,repository.name,author,maintainer,latestVersion,nativeDepiction,depiction', self)
         # convert packages to Package objects
         return [Package(package) for package in response.get('data')]
     
@@ -66,14 +80,12 @@ class Canister():
         Returns:
             List[Repo]: List of repos that Canister found matching the query.
         '''
-        if self.closed:
-            raise ClosedError('This client is closed.')
-        if self.__session is None:
-            self.__session = ClientSession()
+        # run pre-method function
+        await self.__pre_method__()
         # normalize query string
-        query = urllib.parse.quote(query)
+        query = quote(query)
         # make request
-        response = await canister_request(f'/repositories/search?query={query}', self.ua, 1, self.__session)
+        response = await canister_request(f'/repositories/search?query={query}', self)
         # convert packages to Repository objects
         return [Repo(repo) for repo in response.get('data')]
 
@@ -84,13 +96,11 @@ class Canister():
         Returns:
             bool: Whether or not the repo is piracy.
         '''
-        if self.closed:
-            raise ClosedError('This client is closed.')
-        if self.__session is None:
-            self.__session = ClientSession()
+        # run pre-method function
+        await self.__pre_method__()
         # trim url string
         query = query.replace('https://', '').replace('http://', '')
         # get piracy repos
-        r = await piracy_repos(self.__session)
+        r = await piracy_repos(self)
         # return
         return query in r
