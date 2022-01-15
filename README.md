@@ -24,7 +24,7 @@ import asyncio
 from typing import List
 # import canister
 from canisterpy import (
-    Canister, Package, SearchFields
+    Canister, Package, PackageSearchFields
 )
 
 # set up client
@@ -33,10 +33,10 @@ client = Canister(user_agent='Canister.py Example')
 # main function
 async def main(package: str) -> List[Package]:
     # create search fields
-    fields = SearchFields()
+    fields = PackageSearchFields()
     # pick out fields
     # we want to search by name and author, so
-    fields.set('name', True).set('author', True).set('maintainer', False).set('description', False)
+    fields.set('name', True).set('author', True)
     # search for query
     packages = client.search_package(package, fields)
     # return what we found

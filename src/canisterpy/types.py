@@ -7,22 +7,69 @@ from .errors import InvalidFieldError
 from datetime import datetime
 from typing import Optional
 
-# search fields
-class SearchFields(object):
+# package search fields
+class PackageSearchFields(object):
     '''
     Fields to search for packages with.
     '''
     def __init__(self):
         self.__map = {
-            'name': True,
-            'author': True,
-            'maintainer': True,
-            'description': True
+            'name': False,
+            'author': False,
+            'maintainer': False,
+            'description': False,
+            'identifier': False
         }
+    
+    def all_true(self) -> PackageSearchFields:
+        '''Sets all fields to true.'''
+        for m in self.__map.keys():
+            self.__map[m] = True
+        return self
 
-    def set(self, key: str, value: bool) -> SearchFields:
+    def set(self, key: str, value: bool) -> PackageSearchFields:
+        '''Set a field value.
+        Args:
+            key (str): Key to set.
+            value (bool): Value to set key to.
+        Returns:
+            SearchFields: Updated class object.
         '''
-        Set a field value.
+        if key.lower() not in self.__map.keys():
+            InvalidFieldError('Invalid field {} provided.'.format(key))
+        self.__map[key.lower()] = value
+        return self
+    
+    @property
+    def __string__(self):
+        fin = ''
+        for k in self.__map.keys():
+            if self.__map[k] is True:
+                fin += (k + ',')
+        return (fin[::-1].replace(','[::1], ''[::-1], 1))[::-1]
+
+# repository search fields
+class RepositorySearchFields(object):
+    '''
+    Fields to search for repositories with.
+    '''
+    def __init__(self):
+        self.__map = {
+            'slug': False,
+            'uri': False,
+            'aliases': False,
+            'name': False,
+            'description': False
+        }
+    
+    def all_true(self) -> PackageSearchFields:
+        '''Sets all fields to true.'''
+        for m in self.__map.keys():
+            self.__map[m] = True
+        return self
+
+    def set(self, key: str, value: bool) -> PackageSearchFields:
+        '''Set a field value.
         Args:
             key (str): Key to set.
             value (bool): Value to set key to.

@@ -2,15 +2,25 @@
 # canister.py
 
 # imports
-from .errors import InitializationError, ClosedError
-from .requests import canister_request, piracy_repos
-from .types import Repo, Package, SearchFields
+from .errors import (
+    InitializationError, ClosedError
+)
+from .requests import (
+    canister_request, piracy_repos
+)
+from .types import (
+    Repo, Package, PackageSearchFields, RepositorySearchFields
+)
 from aiohttp import ClientSession
 from asyncio import run
 from atexit import register
 from datetime import datetime
 from typing import List, Optional
 from urllib.parse import quote
+
+import logging
+
+_log = logging.getLogger(__name__)
 
 class Canister():
     '''The main Canister class.
@@ -33,6 +43,7 @@ class Canister():
         if self.__closed:
             raise ClosedError('This client is closed.')
         if self._session is None:
+            _log.info('Creating new AIOHTTP client.')
             self._session = ClientSession()
     
     def is_closed(self) -> bool:
@@ -55,11 +66,11 @@ class Canister():
             run(self._session.close())
         self.__closed = True
 
-    async def search_package(self, query: str, search_fields: SearchFields = SearchFields(), limit: int = 100) -> List[Package]:
+    async def search_package(self, query: str, search_fields: PackageSearchFields = PackageSearchFields().all_true(), limit: int = 100) -> List[Package]:
         '''Search for a package.
         Args:
             query (str): Query to search for.
-            search_fields (Optional[SearchFields]): Fields to search for. (defaults to 'name,author,maintainer,description')
+            search_fields (Optional[PackageSearchFields]): Fields to search for.
             limit (Optional[str]): Response length limit. (defaults to 100)
         Returns:
             List[Package]: List of packages that Canister found matching the query.
@@ -69,14 +80,15 @@ class Canister():
         # normalize query string
         query = quote(query)
         # make request
-        response = await canister_request(f'/packages/search?query={query}&limit={limit}&searchFields={search_fields.__string__}&responseFields=name,author,maintainer,description&responseFields=identifier,header,tintColor,name,price,description,packageIcon,repository.uri,repository.name,author,maintainer,latestVersion,nativeDepiction,depiction', self)
+        response = await canister_request(f'/packages/search?query={query}&limit={limit}&searchFields={search_fields.__string__}&responseFields=*', self)
         # convert packages to Package objects
         return [Package(package) for package in response.get('data')]
     
-    async def search_repo(self, query: str) -> List[Repo]:
+    async def search_repo(self, query: str, search_fields: RepositorySearchFields = RepositorySearchFields().all_true()) -> List[Repo]:
         '''Search for a repo.
         Args:
             query (str): Query to search for.
+            search_fields (Optional[PackageSearchFields]): Fields to search for.
         Returns:
             List[Repo]: List of repos that Canister found matching the query.
         '''
@@ -85,7 +97,7 @@ class Canister():
         # normalize query string
         query = quote(query)
         # make request
-        response = await canister_request(f'/repositories/search?query={query}', self)
+        response = await canister_request(f'/repositories/search?query={query}&searchFields={search_fields.__string__}', self)
         # convert packages to Repository objects
         return [Repo(repo) for repo in response.get('data')]
 
