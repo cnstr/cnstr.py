@@ -3,7 +3,14 @@
         user_agent (str): User Agent to pass to the Canister API.
         session (Optional[ClientSession]): Optional session to use for requests.
     
-# close (`synchronous` function of Canister):  Close and deallocate the current client.
+# close (`synchronous` function of Canister):  Close the client.
+
+    No client methods should be running.
+
+    This is idempotent and irreversible.
+
+    No other methods should be called after this one.
+# is_closed (`synchronous` function of Canister):  Checks if the client is closed.
 # is_repo_piracy (`asynchronous` function of Canister):  Find out if a repo is piracy.
     Args:
         query (str): Repo URI.
@@ -24,10 +31,6 @@
     Returns:
         List[Repo]: List of repos that Canister found matching the query.
     
-# InvalidField (class):  Error thrown when an invalid field is passed to SearchFields.
-# args (`synchronous` getset_descriptor of InvalidField):  None
-# with_traceback (`synchronous` method_descriptor of InvalidField):  Exception.with_traceback(tb) --
-    set self.__traceback__ to tb and return self.
 # Package (class):  
     Canister package object.
     
