@@ -1,5 +1,5 @@
 **__pycache__
 venv/
-src/canisterpy.egg-info
+src/cnstr.egg-info
 dist/
 build/
