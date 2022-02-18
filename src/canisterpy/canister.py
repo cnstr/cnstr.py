@@ -10,7 +10,7 @@ from .types import (
 )
 from aiohttp import ClientSession
 from aiocache import cached
-from asyncio import run
+from asyncio import ensure_future
 from atexit import register
 from datetime import datetime
 from typing import List, Optional
@@ -104,7 +104,7 @@ class Canister():
         if self.__session is None: return
         # close the http session
         if not self.__session.closed:
-            run(self.__session.close())
+            ensure_future(self.__session.close())
         self.__closed = True
 
     async def search_package(self, query: str, search_fields: PackageSearchFields = PackageSearchFields().all_true(), limit: int = 100) -> List[Package]:
